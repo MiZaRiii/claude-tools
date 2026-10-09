@@ -8,16 +8,18 @@
 // Свойство: скаляр (только базовый адаптив, остальные наследуют) или массив по screens: [1200, 640, 320]; undefined — не задавать.
 // Сохраняет и публикует человек, если не поручено иначе.
 window.ZG = (() => {
+  const VERSION = "1.1.0";
   const C = { screens: null, family: "Arial", weight: "400", color: "#000000" };
   let seq = 0;
   const tmpId = () => "tmp" + String(++seq).padStart(4, "0");
   const rhd = (x) => Math.ceil(x - 0.5); // размер шрифта целый, .5 вниз
   const two = (x) => +x.toFixed(2);
+  const int = (x) => Math.round(x) || 0;
   const scr = () => C.screens || detect();
   const sfx = (r) => (r === scr()[0] ? "" : "-res-" + r);
   const all = (v) => (Array.isArray(v) ? v : scr().map(() => v));
-  const lsPx = (pct, fs) => all(pct).map((p, i) => (p === undefined ? undefined : two((p / 100) * rhd(Array.isArray(fs) ? fs[i] : fs))));
-  const INT = new Set(["top", "left", "width", "height"]);
+  const lsPx = (pct, fs) => all(pct).map((p, i) => (p === undefined ? undefined : int((p / 100) * rhd(Array.isArray(fs) ? fs[i] : fs))));
+  const INT = new Set(["top", "left", "width", "height", "letterspacing"]);
   const num = (v, k) => (typeof v === "number" ? String(INT.has(k) ? Math.round(v) : two(v)) : v);
   const apply = (out, pairs) => {
     const S = scr();
@@ -87,8 +89,9 @@ window.ZG = (() => {
   const count = (ns) => ns.reduce((s, n) => s + 1 + (n.children ? count(n.children) : 0), 0);
 
   // ---- редактор (Zero может быть открыт внутри страницы редактора: ищем его окно сами) ----
-  const f = typeof document !== "undefined" ? [...document.querySelectorAll("iframe")].find((x) => /zero/.test(x.src)) : null;
-  const w = f ? f.contentWindow : window, d = w.document;
+  let w, d;
+  const bind = () => { const f = typeof document !== "undefined" ? [...document.querySelectorAll("iframe")].find((x) => /zero/.test(x.src)) : null; w = f ? f.contentWindow : window; d = w.document; };
+  bind();
   // адаптивы из переключателя экранов редактора
   function detect() {
     const out = new Set();
@@ -108,6 +111,7 @@ window.ZG = (() => {
   const setAll = (e, fld, v) => { for (const r of scr()) w.elem__setFieldValue(e, fld, String(v), "render", "updateui", r); };
 
   async function ready() {
+    bind();
     for (let i = 0; i < 100; i++) {
       // окно «есть несохранённая локальная версия блока» — отказываемся, работаем с сохранённой
       if (/locally saved|локальн/i.test(d.body.innerText.slice(0, 4000))) { const b = [...d.querySelectorAll("*")].find((e) => e.children.length === 0 && /^(cancel|отмена)$/i.test((e.textContent || "").trim()) && e.offsetParent); if (b) b.click(); }
@@ -221,7 +225,7 @@ window.ZG = (() => {
   }
 
   return {
-    cfg: (o) => Object.assign(C, o), screens: scr, text, image, shape, group, lsPx, rhd, finalize, depth, count,
-    w, d, sleep, res, layer, group_: grp, ready, clear, deselect, setArtboard, inject, paste, fixFreeGroups, patch, uploadImages, heights, build, dump,
+    version: VERSION, cfg: (o) => Object.assign(C, o), screens: scr, text, image, shape, group, lsPx, rhd, finalize, depth, count,
+    get w() { return w; }, get d() { return d; }, sleep, res, layer, group_: grp, ready, clear, deselect, setArtboard, inject, paste, fixFreeGroups, patch, uploadImages, heights, build, dump,
   };
 })();

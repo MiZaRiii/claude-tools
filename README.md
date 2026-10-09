@@ -4,6 +4,6 @@
 
 | Путь | Что |
 |---|---|
-| `tilda-kit/zg.js` | Сборка Zero Block Tilda из спецификации прямо в редакторе: `ZG.build`, `ZG.patch`, `ZG.dump`. Используется скиллом `figma-to-tilda-zero`. |
+| `tilda-kit/zg.js` | Сборка Zero Block Tilda из спецификации прямо в редакторе: `ZG.build`, `ZG.patch`, `ZG.dump`. Используется скиллом `figma-to-tilda-zero`. Устройство и ловушки редактора: `tilda-kit/README.md`. |
 
 Данные конкретных проектов (id страниц, Figma, шрифты) сюда не кладутся: они хранятся в `tilda-profile.json` самого проекта.
